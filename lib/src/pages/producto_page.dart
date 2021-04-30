@@ -163,7 +163,12 @@ class _ProductoPageState extends State<ProductoPage> {
 
   Widget _mostrarFoto() {
     if (producto.fotoUrl != null) {
-      return Container();
+      return FadeInImage(
+        image: NetworkImage(producto.fotoUrl),
+        placeholder: AssetImage('assets/jar-loading.gif'),
+        height: 300.0,
+        fit: BoxFit.contain,
+      );
     } else {
       return Image(
         image:
@@ -186,7 +191,7 @@ class _ProductoPageState extends State<ProductoPage> {
     foto = await ImagePicker.pickImage(source: origen);
 
     if (foto != null) {
-      //limpieza
+      producto.fotoUrl = null;
     }
 
     setState(() {});
