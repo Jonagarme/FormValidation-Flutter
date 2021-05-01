@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:form_validation/src/bloc/provider.dart';
 import 'package:form_validation/src/models/producto_model.dart';
-import 'package:form_validation/src/providers/productos_provider.dart';
 
 class HomePage extends StatelessWidget {
-  final productosProvider = new ProductosProvider();
+  //final productosProvider = new ProductosProvider();
 
   @override
   Widget build(BuildContext context) {
     //final bloc = Provider.of(context);
 
+    final productosBloc = Provider.productosBloc(context);
+    productosBloc.cargarProductos();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
       ),
-      body: _crearListado(),
+      body: _crearListado(productosBloc),
       floatingActionButton: _crearBoton(context),
     );
   }
 
-  Widget _crearListado() {
-    return FutureBuilder(
-      future: productosProvider.cargarProductos(),
+  Widget _crearListado(ProductosBloc productosBloc) {
+    return StreamBuilder(
+      stream: productosBloc.productosStram,
       builder:
           (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
         if (snapshot.hasData) {
@@ -29,7 +31,7 @@ class HomePage extends StatelessWidget {
           return ListView.builder(
             itemCount: productos.length,
             itemBuilder: (context, i) =>
-                _crearItem(context, productos[i], productos, i),
+                _crearItem(context, productosBloc, productos[i], productos, i),
           );
         } else {
           return Center(child: CircularProgressIndicator());
@@ -38,15 +40,16 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _crearItem(BuildContext context, ProductoModel producto,
-      List<ProductoModel> prod, int position) {
+  Widget _crearItem(BuildContext context, ProductosBloc productosBloc,
+      ProductoModel producto, List<ProductoModel> prod, int position) {
     return Dismissible(
       key: UniqueKey(),
       background: Container(
         color: Colors.red,
       ),
       onDismissed: (direction) {
-        productosProvider.borrarProducto(producto.id);
+        //productosProvider.borrarProducto(producto.id);
+        productosBloc.borrarProducto(producto.id);
       },
       child: Card(
         child: Column(
